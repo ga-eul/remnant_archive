@@ -1,7 +1,7 @@
 {
   "name": "remnant-archive-demo",
   "productName": "Remnant Archive Demo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "REMNANT ARCHIVE — CASE 01 데모 (Windows 앱)",
   "private": true,
   "main": "main.js",
