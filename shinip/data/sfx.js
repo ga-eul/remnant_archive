@@ -46,7 +46,7 @@ R01.SFX_FILES = {
 R01.SFX = {
   0:  { file: 'notice-typing.mp3', vol: 0.70, gap: 0, at: '플레이 전 안내 글자 타이핑(한 번, 8초). 누르면 즉시 정지, 글이 다 나오면 정지·초기화' },  // D86 8초 연속음이라 0.70
   1:  { file: 'hub-click.mp3', vol: 1.00, gap: 60, at: '메인 허브 버튼 클릭' },
-  2:  { file: 'hub-menu.mp3', vol: 0.20, gap: 0, clip: { hold: 3, fade: 1 }, at: '메인 허브 메뉴 전환(↑↓ 이동·마우스로 다른 메뉴에 올림). 118초 원본 중 앞 3초 + 1초 페이드' },
+  2:  { file: 'hub-menu.mp3', vol: 0.20, gap: 0, clip: { hold: 3, fade: 1 }, at: '쓰지 않음 (D94: 허브 메뉴 이동은 소리 없음). 이전 용도: 메인 허브 메뉴 전환, 118초 원본 중 앞 3초 + 1초 페이드' },
   3:  { file: 'select-beep.mp3', vol: 1.00, gap: 80, at: '입사 화면 사원증 사진 선택' },
   4:  { file: 'idcard-issue.mp3', vol: 0.35, gap: 300, at: '입사 화면 [발급]' },
   5:  { file: 'intranet-tab.mp3', vol: 1.80, gap: 80, at: '인트라넷 상단 탭 전환' },                  // 원본이 작아 +5.1dB 증폭 (피크 -15.7dBFS)

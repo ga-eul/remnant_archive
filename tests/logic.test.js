@@ -423,7 +423,8 @@ ok(!/실험용|TEMP/.test(all.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '').replace(
   if (fs.existsSync(hubP)) {
     const hub = fs.readFileSync(hubP, 'utf8');
     ok(hub.includes('src="shinip/data/sfx.js"') && hub.includes('src="shinip/js/sound.js"'), 'D83 허브에서 효과음 불러옴');
-    ok(/SND\.setOn\(S\.sound\)/.test(hub) && /SND\.play\(2\)/.test(hub) && /SND\.play\(1\)/.test(hub), 'D83 허브 소리 버튼·1·2번 연결');
+    ok(/SND\.setOn\(S\.sound\)/.test(hub) && /SND\.play\(1\)/.test(hub), 'D83 허브 소리 버튼·1번 연결');
+    ok(!/SND\.play\(2\)/.test(hub) && !/addEventListener\('mouseenter'/.test(hub), 'D94 허브 메뉴 이동(↑↓·마우스)에는 소리 없음');
   }
   const demoP = path.join(dir, '..', 'shinip_demo_complete.html');
   if (fs.existsSync(demoP)) ok(/R01\.sound\.navigate\(encodeURI\(HUB_URL\),32\)/.test(fs.readFileSync(demoP, 'utf8')), 'D83 데모 [허브로 돌아가기] 32번');
