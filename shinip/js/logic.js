@@ -35,6 +35,7 @@ window.R01 = window.R01 || {};
       tried_pairs: [],   // R-37a·D26 — 시도한 조합 (순서 무관), C13 단계도 같은 방식 (D27)
       clue_order: [],    // 획득 순서 (My Archive·C13 후보 정렬, D28)
       memo: '',          // 추리 메모장 (플레이어가 직접 쓰는 메모, 진행 칸에 함께 저장)
+      memo_opened: false, // 추리 메모장을 한 번이라도 열었는지 (열기 전까지 버튼에 표시 점, D97)
       // 장소 조사 (D73): 하위 부분 열람 기록('03A:roster' 등), 보조자료 열람 기록, 눌러 본 오브젝트
       parts_seen: [], notes_read: [], spots_checked: [],
       ending_id: null, ending_evaluation: false, investigation_grade: null,

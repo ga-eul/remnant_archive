@@ -267,7 +267,8 @@ window.R01 = window.R01 || {};
   function crossword(s) {
     const K = Math.max(...CW.words.map((w) => w.star));
     const width = Math.max(...CW.words.map((w) => K - w.star + w.answer.length));
-    const grid = h('div', { class: 'cw-grid', style: 'grid-template-columns:repeat(' + (width + 1) + ',var(--cw))' });
+    // 번호 칸은 좁게, 글자 칸은 래미 창 폭에 맞춰 줄어든다 (오른쪽이 잘리지 않게)
+    const grid = h('div', { class: 'cw-grid', style: 'grid-template-columns:16px repeat(' + width + ',minmax(0,var(--cw)))' });
     CW.words.forEach((w, i) => {
       const off = K - w.star;
       const solved = s.crossword_solved.includes(i);

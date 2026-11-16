@@ -476,6 +476,15 @@ ok(L.clue('06DE').name === '계정 이력 및 시스템 감사 로그', 'D85 06-
   ok(c26.clip && !c26.delay && Math.abs(c26.clip.hold + c26.clip.fade - life) < 0.01, 'D87 26번이 노이즈(' + life + 's)와 함께 끝남');
 }
 
+// D97 추리 메모장: 상단 버튼·처음 표시 점·M 키
+{
+  const mainJs = fs.readFileSync(path.join(dir, 'js', 'main.js'), 'utf8');
+  const pg = fs.readFileSync(path.join(dir, 'js', 'pages.js'), 'utf8');
+  ok(L.newState().memo_opened === false, 'D97 memo_opened 기본값 false');
+  ok(/class: 'btn small memo-top'/.test(mainJs) && /R\.pages\.memoDot\(s\)/.test(mainJs), 'D97 상단 머리줄 [추리 메모장]·표시 점');
+  ok(/e\.code !== 'KeyM'/.test(mainJs) && /a\.tagName === 'INPUT' \|\| a\.tagName === 'TEXTAREA'/.test(mainJs), 'D97 M 키, 입력 중에는 동작 안 함');
+  ok(/if \(!st\.memo_opened\) \{/.test(pg) && /s\.memo_opened \? null/.test(pg), 'D97 처음 열면 표시 점 지움');
+}
 // D90 재생·실패 효과음(16·18)은 05-B-VHS에만 / D95 재생되는 동안 소리: 05-B-VHS 17, 03-B 33
 {
   const pg = fs.readFileSync(path.join(dir, 'js', 'pages.js'), 'utf8');

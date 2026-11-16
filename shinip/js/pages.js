@@ -688,7 +688,6 @@ window.R01 = window.R01 || {};
     draw();
     return h('aside', { class: 'side-panel', role: 'dialog', 'aria-label': 'My Archive' },
       h('div', { class: 'side-head' }, h('strong', null, 'My Archive'), h('span', { class: 'muted mono' }, '총 ' + s.clue_order.length + '건'),
-        h('button', { type: 'button', class: 'memo-btn', onClick: () => P.memo() }, '추리 메모장'),
         h('button', { type: 'button', class: 'msgr-x', 'aria-label': '닫기', onClick: onClose }, '×')),
       body);
   };
@@ -712,10 +711,16 @@ window.R01 = window.R01 || {};
     document.body.append(over);
     closeBtn.focus();
   }
-  /* 추리 메모장 (인트라넷 UI/추리 메모장.png 시안): My Archive에서 연다. 쓰는 대로 진행 칸에 저장 */
+  /* 추리 메모장 (인트라넷 UI/추리 메모장.png 시안): 상단 머리줄 버튼·M 키로 연다 (D97). 쓰는 대로 진행 칸에 저장 */
+  /* 한 번도 열지 않았으면 메모장 버튼에 표시 점 (D97) */
+  P.memoDot = (s) => (s.memo_opened ? null : h('span', { class: 'memo-dot', 'aria-hidden': 'true' }));
   P.memo = function () {
     if (document.querySelector('.memo-over')) return;
     const st = R.app.state;
+    if (!st.memo_opened) {                                  // 처음 열면 표시 점을 지운다
+      st.memo_opened = true; R.store.saveCase(st);
+      document.querySelectorAll('.memo-dot').forEach((d) => d.remove());
+    }
     const area = h('textarea', { class: 'memo-text', placeholder: '여기에 메모를 입력하세요.', 'aria-label': '추리 메모', spellcheck: 'false' });
     area.value = st.memo || '';
     let timer = null;

@@ -79,6 +79,8 @@ window.R01 = window.R01 || {};
           h('div', { class: 'row' },
             s.id_card_issued ? h('span', { class: 'me' }, R.pages.avatar(s.player_avatar, 28),
               h('span', null, s.player_name), h('span', { class: 'mono accent' }, R.OPENING.employeeNo)) : null,
+            canArchive ? h('button', { type: 'button', class: 'btn small memo-top', title: '추리 메모장 (M)', onClick: () => R.pages.memo() },   // D97
+              '추리 메모장', R.pages.memoDot(s)) : null,
             canArchive ? h('button', { type: 'button', class: 'btn small archive-btn', onClick: () => R.pages.archive(s) },
               'My Archive', h('span', { class: 'archive-count mono' }, String(s.clue_order.length))) : null)),
         stepBar(s) || '',            // 단계 표시줄이 없는 화면(엔딩 수집 등)에 "null" 글자가 찍히지 않게
@@ -116,6 +118,17 @@ window.R01 = window.R01 || {};
         button(id + (s['connection_' + id] ? ' ✓' : ''), () => toggle(id), { small: true, primary: s['connection_' + id], disabled: s.board_locked }))),
       button('진행 칸 지우기', () => { S.clearCase(); S.setStatus('none'); location.reload(); }, { small: true }));
   }
+
+  /* M 키: 추리 메모장 열기 (D97). 글을 쓰는 중이거나 오프닝·엔딩·엔딩 수집 화면에서는 동작하지 않는다. 닫기는 Esc */
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'KeyM' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;   // 한글 입력 상태(ㅡ)에서도 같은 키
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
+    const s = app.state;
+    if (!s || ['01', 'ending', 'collection'].includes(s.page) || document.querySelector('.memo-over')) return;
+    e.preventDefault();
+    R.pages.memo();
+  });
 
   applyReduced();
   if (R.sound) R.sound.preload(Object.keys(R.SFX || {}).filter((id) => !['1', '2', '32'].includes(id) && R.SFX[id].bus !== 'bgm'));   // 게임에서 쓰는 효과음 미리 받기 (D83, 허브 배경음 제외 D91)
