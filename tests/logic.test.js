@@ -385,8 +385,8 @@ ok(!/실험용|TEMP/.test(all.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '').replace(
   const keys = Object.keys(SFX);                                   // 번호 + 보조 번호('29-1', D88)
   const ids = keys.filter((k) => /^\d+$/.test(k)).map(Number).sort((x, y) => x - y);
   ok(JSON.stringify(keys.filter((k) => !/^\d+$/.test(k))) === JSON.stringify(['29-1', 'bgm1']), 'D88·D91 번호가 아닌 항목은 29-1, bgm1');
-  const want = []; for (let n = 0; n <= 32; n++) if (![13, 15, 21].includes(n)) want.push(n);
-  ok(JSON.stringify(ids) === JSON.stringify(want), 'D83·D86 효과음 30개 (0~32번 중 13·15·21번 없음)');
+  const want = []; for (let n = 0; n <= 33; n++) if (![13, 15, 21].includes(n)) want.push(n);
+  ok(JSON.stringify(ids) === JSON.stringify(want), 'D83·D86·D95 효과음 31개 (0~33번 중 13·15·21번 없음)');
   const sfxDir = path.join(dir, 'assets', 'sfx');
   const onDisk = fs.readdirSync(sfxDir).filter((f) => f.endsWith('.mp3')).sort();
   ok(JSON.stringify(onDisk) === JSON.stringify(Object.keys(FILES).filter((f) => !FILES[f].dir).sort()), 'D83 assets/sfx 파일 = SFX_FILES 목록');
@@ -432,9 +432,10 @@ ok(!/실험용|TEMP/.test(all.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '').replace(
   const wired = new Set([...code.matchAll(/R\.sound\.play\((\d+)\)/g)].map((m) => Number(m[1])));
   if (/R\.sound\.play\(ok \? 9 : 10\)/.test(code)) { wired.add(9); wired.add(10); }
   if (/\{ 1: 29, 2: 30, 3: 31 \}/.test(code)) { wired.add(29); wired.add(30); wired.add(31); }
+  if (/const loopSfx = a\.vhs \? 17 : 33;/.test(code) && /R\.sound\.play\(loopSfx\)/.test(code)) { wired.add(17); wired.add(33); }   // D95
   const gameIds = want.filter((n) => ![0, 1, 2, 32].includes(n));
   const missing = gameIds.filter((n) => !wired.has(n));
-  ok(missing.length === 0, 'D83·D86 게임 효과음 26개 모두 연결 ' + missing.join(','));
+  ok(missing.length === 0, 'D83·D86·D95 게임 효과음 27개 모두 연결 ' + missing.join(','));
   // D88: 29-1 로그아웃은 엔딩 1 로그아웃 장면에서만, 한 번, 장면이 사라지면 정지
   const fin = fs.readFileSync(path.join(dir, 'js', 'finale.js'), 'utf8');
   ok((code.match(/R\.sound\.play\('29-1'\)/g) || []).length === 1 && /if \(!logoutSfx\) \{ logoutSfx = true; R\.sound\.play\('29-1'\); \}/.test(fin) && /R\.sound\.stop\('29-1'/.test(fin), 'D88 엔딩 1 로그아웃 효과음 한 번·정지');
@@ -471,10 +472,13 @@ ok(L.clue('06DE').name === '계정 이력 및 시스템 감사 로그', 'D85 06-
   ok(c26.clip && !c26.delay && Math.abs(c26.clip.hold + c26.clip.fade - life) < 0.01, 'D87 26번이 노이즈(' + life + 's)와 함께 끝남');
 }
 
-// D90 CCTV 효과음(16·17·18)은 05-B-VHS에만, 03-B는 없음
+// D90 재생·실패 효과음(16·18)은 05-B-VHS에만 / D95 재생되는 동안 소리: 05-B-VHS 17, 03-B 33
 {
   const pg = fs.readFileSync(path.join(dir, 'js', 'pages.js'), 'utf8');
-  ok(/const sfx = !!a\.vhs;/.test(pg) && /if \(sfx\) R\.sound\.play\(16\)/.test(pg) && /if \(sfx\) \{ R\.sound\.stop\(17\); R\.sound\.play\(18\); \}/.test(pg) && /const noiseOn = \(\) => \{\s+if \(!sfx\) return;/.test(pg), 'D90 CCTV 효과음은 vhs 영상에만');
+  ok(/const sfx = !!a\.vhs;/.test(pg) && /if \(sfx\) R\.sound\.play\(16\)/.test(pg) && /R\.sound\.stop\(loopSfx\); if \(sfx\) R\.sound\.play\(18\);/.test(pg), 'D90 16·18은 vhs 영상에만');
+  ok(/const loopSfx = a\.vhs \? 17 : 33;/.test(pg) && /R\.sound\.stop\(loopSfx\)/.test(pg) && R.SFX[33].loop && R.SFX[33].file === 'video-tape.mp3', 'D95 03-B 재생 중 33 비디오테이프, 05-B-VHS는 17');
+  const lv = (n) => R.SFX_FILES[R.SFX[n].file].rms + 20 * Math.log10(R.SFX[n].vol);
+  ok(Math.abs(lv(33) - lv(17)) <= 0.5, 'D95 33번 크기 = 17번 크기 (RMS ±0.5dB)');
   ok(R.CLUE_ASSETS['05B_VHS'].vhs === true && R.CLUE_ASSETS['03B'].kind === 'cctv' && !R.CLUE_ASSETS['03B'].vhs, 'D90 vhs 표시는 05-B-VHS에만');
 }
 

@@ -238,7 +238,8 @@ window.R01 = window.R01 || {};
     const img = h('img', { class: 'cctv-still', src: a.img, alt: x.name });
     const vid = h('video', { class: 'cctv-video', src: a.video, playsinline: true, preload: 'metadata', hidden: true });
     let tried = false;                                   // [영상 재생]을 누른 뒤에만 실패 안내를 띄운다
-    const sfx = !!a.vhs;                                 // CCTV 효과음(16·17·18)은 05-B-VHS 복구 영상에만. 03-B는 소리 없음 (D90)
+    const sfx = !!a.vhs;                                 // 재생·실패 효과음(16·18)은 05-B-VHS 복구 영상에만 (D90)
+    const loopSfx = a.vhs ? 17 : 33;                     // 재생되는 동안 소리: 05-B-VHS는 17 영상 노이즈, 03-B는 33 비디오테이프 (D95)
     const start = () => {
       tried = true; fail.hidden = true;
       if (sfx) R.sound.play(16);
@@ -253,7 +254,7 @@ window.R01 = window.R01 || {};
     const onFail = () => {
       if (!tried || !box.isConnected) return;
       vid.pause(); vid.hidden = true; img.hidden = false;
-      if (sfx) { R.sound.stop(17); R.sound.play(18); }
+      R.sound.stop(loopSfx); if (sfx) R.sound.play(18);
       box.classList.remove('playing');
       setClock(a.still[isReduced() ? Math.min(1, a.still.length - 1) : i]);
       play.textContent = '▶ 영상 재생';
@@ -264,12 +265,11 @@ window.R01 = window.R01 || {};
       h('p', null, '영상을 불러오지 못했습니다. 다시 재생해 주세요.'), button('다시 재생', start, { small: true }));
     vid.addEventListener('error', onFail);
     vid.addEventListener('playing', () => { fail.hidden = true; noiseOn(); });
-    /* 17 영상 노이즈: 재생되는 동안만 반복, 멈춤·끝·창 닫기에서 정지 (D83) */
+    /* 재생되는 동안 소리(17 영상 노이즈·33 비디오테이프): 재생되는 동안만 반복, 멈춤·끝·창 닫기에서 정지 (D83·D95) */
     let noiseWatch = null;
-    const noiseOff = () => { clearInterval(noiseWatch); noiseWatch = null; R.sound.stop(17); };
+    const noiseOff = () => { clearInterval(noiseWatch); noiseWatch = null; R.sound.stop(loopSfx); };
     const noiseOn = () => {
-      if (!sfx) return;
-      if (!R.sound.playing(17)) R.sound.play(17);
+      if (!R.sound.playing(loopSfx)) R.sound.play(loopSfx);
       clearInterval(noiseWatch);
       noiseWatch = setInterval(() => { if (!box.isConnected || vid.paused || vid.ended) noiseOff(); }, 250);
     };

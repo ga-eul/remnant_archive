@@ -29,6 +29,7 @@ R01.SFX_FILES = {
   'clue-open.mp3':           { src: ['14-장소수색-단서열람.mp3'], peak: -11.2, rms: -37.0, sec: 0.96 },
   'cctv-play.mp3':           { src: ['16-cctv-영상재생.mp3'], peak: -6.6, rms: -34.9, sec: 0.41 },
   'cctv-noise.mp3':          { src: ['17-cctv-영상노이즈.mp3'], peak: -6.0, rms: -21.1, sec: 18.26 },
+  'video-tape.mp3':          { src: ['32-비디오테이프.mp3'], peak: -26.0, rms: -42.7, sec: 72.96 },   // D95 (측정: 브라우저 디코드)
   'question-select.mp3':     { src: ['19-직원면담-질문선택.mp3'], peak: -1.0, rms: -28.8, sec: 0.13 },
   'record-new.mp3':          { src: ['20,25.mp3'], peak: -17.6, rms: -36.8, sec: 1.03 },
   'card-place.mp3':          { src: ['22-my arhive-카드배치.mp3'], peak: -21.6, rms: -46.4, sec: 0.74 },
@@ -61,6 +62,7 @@ R01.SFX = {
   16: { file: 'cctv-play.mp3', vol: 0.40, gap: 300, at: 'CCTV [영상 재생]·[다시 재생]' },
   17: { file: 'cctv-noise.mp3', vol: 0.14, gap: 0, loop: true, at: 'CCTV 영상이 재생되는 동안 반복(멈춤·끝·창 닫기에서 정지)' },  // 18초 반복 소리라 0.18 → 0.14
   18: { file: 'fail-beep.mp3', vol: 1.00, gap: 500, at: 'CCTV 재생 실패 안내' },
+  33: { file: 'video-tape.mp3', vol: 1.68, gap: 0, loop: true, at: '03-B CCTV 기록 영상이 재생되는 동안(멈춤·끝·창 닫기·재생 실패에서 정지). 원본 이름은 32-비디오테이프지만 32번은 데모 종료 클릭음이라 33번 (D95)' },  // 17번 실제 크기(RMS -21.1 + 0.14 → -38.2dBFS)에 맞춰 +4.5dB
   19: { file: 'question-select.mp3', vol: 0.25, gap: 100, at: '심문 질문 선택' },
   20: { file: 'record-new.mp3', vol: 1.00, gap: 250, delay: 200, at: '심문 새 진술 기록 저장(질문 선택 직후)' },
   22: { file: 'card-place.mp3', vol: 2.50, gap: 80, at: 'My Archive 조합 칸에 카드 놓기([+]·끌어 놓기)' },  // 원본이 작아 +8dB 증폭 (피크 -13.6dBFS)
