@@ -30,7 +30,7 @@ remnant-intro/
 |---|---|---|
 | 입사 지원하기 | NEW HIRE · CASE 01 | 강조 버튼, FREE 표시 |
 | 이어서 출근하기 | CONTINUE | 비활성 · "기록 없음" |
-| 유출된 기억 | MEMORY FILES | 비활성 · "복구 중" |
+| 유출된 기억 | MEMORY FILES | 엔딩 전 비활성 · "복구 중" / 엔딩 뒤 "일부 복구" (D96) |
 | 보존 기록 | RECORDS | 활성 |
 | 설정 | SETTINGS | 활성 |
 
@@ -73,7 +73,7 @@ remnant-intro/
 - 입사 지원하기 → `shinip/index.html?mode=new` (진행 중인 기록이 있으면 먼저 확인 창)
 - 이어서 출근하기 → `shinip/index.html?mode=continue` (진행 중일 때만 켜짐, 엔딩을 본 뒤에는 ‘근무 종료’)
 - 보존 기록 → `shinip/index.html?view=records` (엔딩 수집 화면, 진행 기록은 건드리지 않음)
-- 유출된 기억 → ‘복구 중’ (데모에서는 잠김)
+- 유출된 기억 → 엔딩을 보기 전에는 ‘복구 중’(잠김). 엔딩을 1개 이상 보면 ‘일부 복구’로 열리고 MEMORY FILES 카드 5장(CASE_01 열람 → 보존 기록, CASE_02~05 잠금)을 보여 줌. 사진은 `shinip/assets/memory/`
 - 설정 → 지금은 설정할 항목이 없어 숨김 (`hidden`을 지우면 다시 보임)
 - 하단 "연출 줄이기"는 저장되어 게임 화면에도 똑같이 적용됩니다.
 

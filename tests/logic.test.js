@@ -425,6 +425,10 @@ ok(!/실험용|TEMP/.test(all.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '').replace(
     ok(hub.includes('src="shinip/data/sfx.js"') && hub.includes('src="shinip/js/sound.js"'), 'D83 허브에서 효과음 불러옴');
     ok(/SND\.setOn\(S\.sound\)/.test(hub) && /SND\.play\(1\)/.test(hub), 'D83 허브 소리 버튼·1번 연결');
     ok(!/SND\.play\(2\)/.test(hub) && !/addEventListener\('mouseenter'/.test(hub), 'D94 허브 메뉴 이동(↑↓·마우스)에는 소리 없음');
+    // D96 유출된 기억: 엔딩 1개 이상이면 열림, CASE_01 열람 + CASE_02·03 잠금 카드(사진) + CASE_04·05 ‘복구 중’ 잠금
+    ok(/id="m-leaked" aria-disabled="true"/.test(hub) && /if \(seenIds\.length\)\{\s+memBtn\.setAttribute\('aria-disabled', 'false'\);\s+document\.getElementById\('t-leaked'\)\.textContent = '일부 복구';/.test(hub), 'D96 엔딩을 본 뒤에만 [유출된 기억] 열림·‘일부 복구’');
+    ok(['CASE_01', 'CASE_02', 'CASE_03', 'CASE_04', 'CASE_05'].every((c) => hub.includes("no:'" + c + "'")) && (hub.match(/open:true/g) || []).length === 1, 'D96 카드 5장, 열람은 CASE_01만');
+    ok(['case02.jpg', 'case03.jpg'].every((f) => fs.existsSync(path.join(dir, 'assets', 'memory', f))), 'D96 CASE_02·03 사진은 shinip/assets/memory (배포에 함께 묶임)');
   }
   const demoP = path.join(dir, '..', 'shinip_demo_complete.html');
   if (fs.existsSync(demoP)) ok(/R01\.sound\.navigate\(encodeURI\(HUB_URL\),32\)/.test(fs.readFileSync(demoP, 'utf8')), 'D83 데모 [허브로 돌아가기] 32번');
