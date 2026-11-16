@@ -675,7 +675,7 @@ window.R01 = window.R01 || {};
           h('div', { class: 'combo-slots' }, slotBox(0), h('span', { class: 'combo-plus' }, '+'), slotBox(1)),
           button('조합하기', combine, { primary: true, disabled: !(slots[0] && slots[1]) }),
           comboMsg ? h('div', { class: 'combo-msg' + (comboMsg.ok ? ' ok' : '') },
-            comboMsg.ok ? [h('span', { class: 'mono new' }, 'NEW'), h('strong', null, comboMsg.card), h('span', null, comboMsg.text)] : comboMsg.text) : null) : null,
+            comboMsg.ok ? [h('span', { class: 'mono new' }, 'NEW'), h('strong', null, comboMsg.card), h('span', null, comboMsg.text)] : comboMsg.text) : null) : '',   // body.append는 null을 "null" 글자로 넣으므로 빈 문자열
         h('div', { class: 'side-tabs' }, [['all', '전체'], ['doc', '문서'], ['cctv', 'CCTV'], ['combo', '단서 조합']].map(([k, label]) =>
           h('button', { type: 'button', class: archiveTab === k ? 'on' : '', onClick: () => { archiveTab = k; draw(); } }, label))),
         raw.length || news.length ? h('div', { class: 'side-list' },
