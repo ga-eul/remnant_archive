@@ -409,6 +409,7 @@ window.R01 = window.R01 || {};
      좁은 화면에서는 도면을 가로로 밀어 보고, 도면 아래 같은 오브젝트의 버튼 목록을 함께 보여 준다 */
   const PLAN_IMG = { archive: 'placeArchive', control: 'placeControl', living: 'placeLiving', lab: 'placeLab', restricted: 'placeRestricted' };
   const SPOT_BADGE = { done: '확인함', new: '새 자료' };
+  const BADGE_IN_TOP = 8;       // 도면 맨 윗줄(위 여백 8% 미만) 오브젝트는 상태 표시를 영역 안쪽 위로 내린다 (도면 밖으로 잘리지 않게)
   let focusSpot = null;          // 자료 창을 닫은 뒤 포커스를 돌려줄 오브젝트 [id, 'map'|'list']
   const pos = (b) => 'left:' + b[0] + '%;top:' + b[1] + '%;width:' + b[2] + '%;height:' + b[3] + '%';
 
@@ -446,7 +447,7 @@ window.R01 = window.R01 || {};
       spots.map((sp) => {
         const b = label(sp);
         const lk = locked(sp);
-        return h('button', { type: 'button', class: 'hot' + b.cls + (lk ? ' locked' : '') + (sp.side ? ' side-' + sp.side : ''), style: pos(sp.box), 'data-spot': sp.id, 'data-where': 'map',
+        return h('button', { type: 'button', class: 'hot' + b.cls + (lk ? ' locked' : '') + (sp.side ? ' side-' + sp.side : '') + (!sp.side && sp.box[1] < BADGE_IN_TOP ? ' badge-in' : ''), style: pos(sp.box), 'data-spot': sp.id, 'data-where': 'map',
           'aria-label': sp.name + (lk ? ' — 잠김' : b.text ? ' — ' + b.text : ''), 'aria-disabled': lk ? 'true' : null, onClick: () => pressSpot(sp, 'map') },
         h('span', { class: 'hot-name' }, sp.name), b.text ? h('span', { class: 'hot-badge mono' }, b.text) : null, lk ? lockMark('hot-lock') : null);
       }));
