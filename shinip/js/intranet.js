@@ -9,7 +9,7 @@ window.R01 = window.R01 || {};
   const fill = (t, s) => t.replace(/\{name\}/g, s.player_name);
 
   /* 화면에만 있는 상태 (저장하지 않음) */
-  const ui = { tab: 'home', panel: null, room: null, roomTab: 'all', search: '', profileTab: 'profile', talking: false, notice: null };
+  const ui = { tab: 'home', panel: null, room: null, roomTab: 'all', search: '', profileTab: 'profile', talking: false, notice: null, ramiScroll: 0 };
 
   /* 고정 SVG 아이콘 (플레이어 입력 없음) */
   const SVG = {
@@ -44,7 +44,7 @@ window.R01 = window.R01 || {};
     }
   }
 
-  function openPanel(name) { ui.panel = name; R.app.render(); }
+  function openPanel(name) { ui.panel = name; ui.ramiScroll = 0; R.app.render(); }
   function closePanel() { ui.panel = null; R.app.render(); }
 
   /* ---------- 상단 메뉴 ---------- */
@@ -263,6 +263,7 @@ window.R01 = window.R01 || {};
   }
 
   /* ---------- 래미 AI 창 + 보안 교육 자료(십자말풀이) ---------- */
+  let cwHangul = null;           // 한글 입력 안내를 띄울 문항 번호 (화면에만 있는 상태)
   function crossword(s) {
     const K = Math.max(...CW.words.map((w) => w.star));
     const width = Math.max(...CW.words.map((w) => K - w.star + w.answer.length));
@@ -279,16 +280,24 @@ window.R01 = window.R01 || {};
     });
     const clues = CW.words.map((w, i) => {
       const solved = s.crossword_solved.includes(i);
-      const input = h('input', { class: 'input mono cw-in', maxlength: String(w.answer.length + 2), 'aria-label': '가로 ' + (i + 1) + ' 답' });
+      const input = h('input', { class: 'input mono cw-in', maxlength: String(w.answer.length + 2), 'data-i': String(i), 'aria-label': '가로 ' + (i + 1) + ' 답' });
       const check = () => {
+        const hangul = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(input.value);
+        cwHangul = hangul ? i : null;                        // 한글이 섞이면 이 문항 아래 안내
         let ok = false;
         commit((st) => { ok = L.solveWord(st, i, input.value); });
         if (ok) R.sound.play(8);                             // 8: 보안키(가로 답) 입력
+        else if (input.value.trim()) R.sound.play(23);       // 오답: 효과음만 (빈 칸은 무반응)
+        // 다시 그린 뒤 입력칸 포커스: 틀리면 같은 문항, 맞히면 다음 빈 문항 (스크롤은 움직이지 않게)
+        const ins = [...document.querySelectorAll('.cw-in')];
+        const target = ins.find((el) => +el.dataset.i >= i) || ins[0];
+        if (target) target.focus({ preventScroll: true });
       };
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') check(); });
       return h('li', { class: solved ? 'done' : '' },
-        h('p', null, h('strong', null, '가로 ' + (i + 1) + '. '), w.clue, h('span', { class: 'muted' }, ' (' + w.answer.length + ')')),
-        solved ? h('p', { class: 'mono accent' }, w.answer + ' ✓') : h('div', { class: 'row' }, input, button('확인', check, { small: true })));
+        h('p', null, h('strong', null, '가로 ' + (i + 1) + '. '), w.clue, h('span', { class: 'muted' }, ' (' + CW.lengthLabel(w.answer.length) + ')')),
+        solved ? h('p', { class: 'mono accent' }, w.answer + ' ✓') : h('div', { class: 'row' }, input, button('확인', check, { small: true })),
+        !solved && cwHangul === i ? h('p', { class: 'cw-warn', role: 'alert' }, CW.hangulMsg) : null);
     });
     const code = h('input', { class: 'input mono', maxlength: '12', placeholder: CW.codeLabel, 'aria-label': CW.codeLabel });
     const submit = () => {
@@ -299,7 +308,7 @@ window.R01 = window.R01 || {};
     };
     code.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
     return h('section', { class: 'cw' },
-      h('p', { class: 'cw-title' }, CW.title), h('p', { class: 'small' }, CW.intro),
+      h('p', { class: 'cw-title' }, CW.title), h('p', { class: 'small' }, CW.intro), h('p', { class: 'cw-note' }, CW.answerNote),
       grid, h('ol', { class: 'cw-clues' }, clues),
       s.security_code_correct ? h('p', { class: 'mono accent' }, CW.codeLabel + ' ' + CW.code + ' ✓')
         : h('div', { class: 'row' }, code, button('입력', submit, { primary: true })));
@@ -308,7 +317,9 @@ window.R01 = window.R01 || {};
   /* 래미 AI 창 (래미_대화창_1.png 시안): 위로 내민 래미 + 이름 줄([대화기록]·닫기) + 대화 영역 + 질문 칩 + 입력 줄 */
   function ramiPanel(s) {
     const chips = RA.questions.filter((q) => !q.needs || s[q.needs]).map((q) => h('button', { type: 'button', class: 'rami-chip', onClick: () => {
-      ramiSay(q.a.map((t) => fill(t, s)), () => {
+      const open = q.word ? CW.words.findIndex((w, i) => !s.crossword_solved.includes(i)) : -1;   // 힌트: 가장 위의 빈 문항
+      const lines = open >= 0 ? [q.word(open + 1, CW.words[open].answer[0])] : q.a.map((t) => fill(t, s));
+      ramiSay(lines, () => {
         if (q.opens === 'crossword') commit((st) => L.openCrossword(st)); else R.app.render();
       });
     } }, q.chip || q.q));
@@ -318,6 +329,11 @@ window.R01 = window.R01 || {};
       : h('div', { class: 'rami-chat' },
         h('p', { class: 'rami-bubble' }, RA.greeting),                       // 첫 등장 뒤 인사 (D37)
         s.crossword_open ? crossword(s) : null);
+    /* 답을 입력할 때마다 화면을 다시 그려도 래미 창 스크롤 위치를 그대로 둔다 (창을 새로 열면 맨 위) */
+    if (!ui.ramiLog) {
+      chat.addEventListener('scroll', () => { ui.ramiScroll = chat.scrollTop; });
+      queueMicrotask(() => { chat.scrollTop = ui.ramiScroll; });
+    }
     // 브리핑 뒤 [제한 시스템 접속]은 질문 칩 옆에 보안 경고 색으로 둔다
     const access = s.briefing_done ? h('button', { type: 'button', class: 'rami-chip rami-access', onClick: () => { R.sound.play(12); commit((st) => L.go(st, '03')); } },
       h('span', { class: 'rami-access-ico', 'aria-hidden': 'true' }, '!'), RA.startSearch) : null;

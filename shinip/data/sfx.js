@@ -64,7 +64,7 @@ R01.SFX = {
   19: { file: 'question-select.mp3', vol: 0.25, gap: 100, at: '심문 질문 선택' },
   20: { file: 'record-new.mp3', vol: 1.00, gap: 250, delay: 200, at: '심문 새 진술 기록 저장(질문 선택 직후)' },
   22: { file: 'card-place.mp3', vol: 2.50, gap: 80, at: 'My Archive 조합 칸에 카드 놓기([+]·끌어 놓기)' },  // 원본이 작아 +8dB 증폭 (피크 -13.6dBFS)
-  23: { file: 'combo-fail.mp3', vol: 0.45, gap: 250, at: 'My Archive 조합 실패' },                    // 성공음보다 커지지 않게 0.65 → 0.45
+  23: { file: 'combo-fail.mp3', vol: 0.45, gap: 250, at: 'My Archive 조합 실패 · 십자말풀이 오답 (D93)' },                    // 성공음보다 커지지 않게 0.65 → 0.45
   24: { file: 'combo-success.mp3', vol: 1.00, gap: 250, at: 'My Archive 조합 성공' },
   25: { file: 'record-new.mp3', vol: 1.00, gap: 250, delay: 450, at: 'My Archive NEW 카드 생성(조합 성공음 뒤)' },
   26: { file: 'rami-warning-glitch.mp3', vol: 0.10, gap: 3000, clip: { hold: 1.26, fade: 0.54 }, at: '제한구역 첫 진입: 노이즈 화면과 함께 시작, 노이즈가 흐려지는 1.26초부터 페이드아웃해 노이즈가 사라지는 1.8초에 끝' },  // 피크 +1.4dBFS → 0.10 (피크 -18.6dBFS). 노이즈 길이는 css .glitch-over 1.8s (D87)
