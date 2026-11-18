@@ -46,8 +46,13 @@
   }
   .topbar .wrap{display:flex; align-items:center; gap:16px; height:62px}
   .brand{display:flex; align-items:center; gap:10px; margin-right:auto}
-  .brand img{height:22px; width:auto; opacity:.95}
-  .brand span{font-family:var(--mono); font-size:12px; letter-spacing:.18em; color:var(--muted)}
+  .brand img{height:34px; width:auto; opacity:1}
+  /* CASE 01: 로고(이미지)와 글꼴을 다르게 — 등폭체 대신 Noto Sans KR 두꺼운 자형 */
+  .brand span{
+    font-family:var(--sans); font-weight:900; font-size:13px;
+    letter-spacing:.22em; color:var(--text);
+    padding-left:11px; border-left:1px solid var(--line); line-height:1;
+  }
   .navlinks{display:flex; gap:2px; font-size:13px; color:var(--muted)}
   .navlinks button{
     appearance:none; background:none; border:0; border-radius:3px;
