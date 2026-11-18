@@ -45,9 +45,16 @@
   .brand{display:flex; align-items:center; gap:10px; margin-right:auto}
   .brand img{height:22px; width:auto; opacity:.95}
   .brand span{font-family:var(--mono); font-size:12px; letter-spacing:.18em; color:var(--muted)}
-  .navlinks{display:flex; gap:20px; font-size:13px; color:var(--muted)}
-  .navlinks a{color:var(--muted)}
-  .navlinks a:hover{color:var(--text); text-decoration:none}
+  .navlinks{display:flex; gap:2px; font-size:13px; color:var(--muted)}
+  .navlinks button{
+    appearance:none; background:none; border:0; border-radius:3px;
+    padding:7px 10px; color:var(--muted);
+    font-family:var(--sans); font-size:13px; line-height:1.4;
+    cursor:pointer; transition:.16s; white-space:nowrap;
+  }
+  .navlinks button:hover{color:var(--text); background:#161c23}
+  .navlinks button.on{color:var(--neon); background:#122028; box-shadow:inset 0 -2px 0 var(--neon)}
+  .brand{cursor:pointer}
 
   /* ── 버튼 ───────────────────────────────────── */
   .btn{
@@ -119,9 +126,22 @@
   }
   .counter b{display:block; color:var(--muted); font-size:15px; font-weight:500; letter-spacing:.06em}
 
+  /* ── 화면 전환 ──────────────────────────────── */
+  /* 한 번에 한 화면만 보인다. 상단 바 버튼과 각 화면 아래 [이전]·[다음]으로 넘긴다 */
+  .screen{display:none}
+  .screen.on{display:block; animation:screenIn .32s ease both}
+  @keyframes screenIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  section.screen{padding:72px 0 80px}
+  section.screen.on{min-height:calc(100vh - 62px)}
+
+  /* 화면 아래 이전·다음 */
+  .pager{
+    display:flex; justify-content:space-between; align-items:center; gap:16px;
+    margin-top:58px; padding-top:24px; border-top:1px solid var(--line);
+  }
+  .pager .spacer{flex:0 0 auto}
+
   /* ── 섹션 공통 ──────────────────────────────── */
-  section{padding:86px 0}
-  section + section{border-top:1px solid #1b2129}
   .sec-no{font-family:var(--mono); font-size:11px; letter-spacing:.3em; color:var(--accent); margin:0 0 12px}
   h2{margin:0 0 14px; font-size:clamp(24px,3vw,32px); font-weight:700; letter-spacing:.02em}
   .sec-lead{margin:0 0 42px; color:var(--muted); max-width:62ch}
@@ -219,6 +239,7 @@
     .hero__bg{animation:none}
     .slogan .caret{animation:none}
     .reveal{opacity:1; transform:none; transition:none}
+    .screen.on{animation:none}
     .btn:hover{transform:none}
     .gal figure:hover .shot{transform:none}
   }
@@ -227,7 +248,8 @@
     .story,.specs,.start,.feats,.gifs{grid-template-columns:1fr}
     .steps,.gal{grid-template-columns:repeat(2,1fr)}
     .counter{display:none}
-    .navlinks{display:none}
+    .navlinks{overflow-x:auto; gap:0}
+    .navlinks button{padding:7px 8px; font-size:12px}
   }
 </style>
 </head>
@@ -236,23 +258,27 @@
 <!-- ─────────────────────────── 상단 바 -->
 <header class="topbar">
   <div class="wrap">
-    <div class="brand">
+    <div class="brand" data-screen="home" role="button" tabindex="0" title="홈으로">
       <img src="images/logo.png" alt="REMNANT ARCHIVE">
       <span>CASE 01</span>
     </div>
     <nav class="navlinks">
-      <a href="#about">소개</a>
-      <a href="#how">플레이 방식</a>
-      <a href="#shots">화면</a>
-      <a href="#info">플레이 정보</a>
-      <a href="#start">시작하기</a>
+      <button type="button" data-screen="home">홈</button>
+      <button type="button" data-screen="about">소개</button>
+      <button type="button" data-screen="how">플레이 방식</button>
+      <button type="button" data-screen="features">특징</button>
+      <button type="button" data-screen="shots">화면</button>
+      <button type="button" data-screen="info">플레이 정보</button>
+      <button type="button" data-screen="start">시작하기</button>
+      <button type="button" data-screen="notice">안내</button>
+      <button type="button" data-screen="next">다음 기록</button>
     </nav>
-    <a class="btn btn--primary" data-link="play" href="#start">브라우저로 플레이</a>
+    <a class="btn btn--primary" data-link="play" href="#">브라우저로 플레이</a>
   </div>
 </header>
 
 <!-- ─────────────────────────── 히어로 -->
-<div class="hero">
+<div class="hero screen" id="home">
   <div class="hero__bg"></div>
   <div class="hero__veil"></div>
   <div class="hero__scan"></div>
@@ -267,8 +293,8 @@
       회사가 보관한 <b>기록</b>과 직원들이 말하는 <b>기억</b>이 조금씩 어긋나 있습니다.
     </p>
     <div class="hero__cta">
-      <a class="btn btn--primary btn--lg" data-link="play" href="#start">브라우저로 플레이</a>
-      <a class="btn btn--lg" data-link="download" href="#start">Windows 다운로드</a>
+      <a class="btn btn--primary btn--lg" data-link="play" href="#">브라우저로 플레이</a>
+      <a class="btn btn--lg" data-link="download" href="#">Windows 다운로드</a>
     </div>
     <div class="chips">
       <span class="chip chip--on">무료 데모</span>
@@ -282,7 +308,7 @@
 </div>
 
 <!-- ─────────────────────────── 소개 -->
-<section id="about">
+<section class="screen" id="about">
   <div class="wrap">
     <p class="sec-no">01 — WELCOME</p>
     <h2>입사를 환영합니다</h2>
@@ -302,7 +328,7 @@
 </section>
 
 <!-- ─────────────────────────── 플레이 방식 -->
-<section id="how">
+<section class="screen" id="how">
   <div class="wrap">
     <p class="sec-no">02 — HOW TO PLAY</p>
     <h2>사내 인트라넷을 직접 조사합니다</h2>
@@ -319,7 +345,7 @@
 </section>
 
 <!-- ─────────────────────────── 특징 -->
-<section id="features">
+<section class="screen" id="features">
   <div class="wrap">
     <p class="sec-no">03 — FEATURES</p>
     <h2>이 데모의 특징</h2>
@@ -345,7 +371,7 @@
 </section>
 
 <!-- ─────────────────────────── 화면 -->
-<section id="shots">
+<section class="screen" id="shots">
   <div class="wrap">
     <p class="sec-no">04 — SCREENS</p>
     <h2>화면</h2>
@@ -366,7 +392,7 @@
 </section>
 
 <!-- ─────────────────────────── 플레이 정보 -->
-<section id="info">
+<section class="screen" id="info">
   <div class="wrap">
     <p class="sec-no">05 — INFORMATION</p>
     <h2>플레이 정보</h2>
@@ -392,7 +418,7 @@
 </section>
 
 <!-- ─────────────────────────── 시작하기 -->
-<section id="start">
+<section class="screen" id="start">
   <div class="wrap">
     <p class="sec-no">06 — START</p>
     <h2>시작하기</h2>
@@ -419,7 +445,7 @@
 </section>
 
 <!-- ─────────────────────────── 안내 -->
-<section id="notice">
+<section class="screen" id="notice">
   <div class="wrap">
     <p class="sec-no">07 — BEFORE YOU PLAY</p>
     <h2>플레이 전 안내</h2>
@@ -436,7 +462,7 @@
 </section>
 
 <!-- ─────────────────────────── 마무리 -->
-<section class="outro" id="next">
+<section class="outro screen" id="next">
   <div class="wrap">
     <p class="sec-no">08 — NEXT</p>
     <h2>아직 열리지 않은 기록</h2>
@@ -466,7 +492,7 @@
    ──────────────────────────────────────────────── */
 const LINKS = {
   play:     'play/',                         // 브라우저 플레이 (같은 사이트의 게임 폴더)
-  download: '',                              // Windows zip 내려받기 주소 (itch.io 등)
+  download: 'https://summertumn.itch.io/remnant-archive',   // Windows 내려받기 (itch.io)
   x:        'https://x.com/remi_r_archive'   // 공식 X 계정
 };
 
@@ -513,19 +539,90 @@ var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   setInterval(function () { n += 1; el.textContent = n.toLocaleString('ko-KR'); }, 4200);
 })();
 
-/* 스크롤에 따라 나타나기 */
+/* ────────────────────────────────────────────────
+   화면 전환 — 스크롤 대신 버튼으로 한 화면씩 본다.
+   상단 바 버튼 · 각 화면 아래 [이전]/[다음] · ← → 키 · 주소창 #해시(뒤로 가기)
+   ──────────────────────────────────────────────── */
 (function () {
-  var items = document.querySelectorAll('.reveal');
-  if (reduce || !('IntersectionObserver' in window)) {
-    Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
-    return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); }
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  var navBtns = Array.prototype.slice.call(document.querySelectorAll('.navlinks button'));
+  var NAMES = {
+    home: '홈', about: '소개', how: '플레이 방식', features: '특징', shots: '화면',
+    info: '플레이 정보', start: '시작하기', notice: '플레이 전 안내', next: '다음 기록'
+  };
+
+  /* 화면이 열릴 때마다 그 화면 안의 .reveal 을 다시 재생 */
+  function playReveal(root) {
+    var items = root.querySelectorAll('.reveal');
+    Array.prototype.forEach.call(items, function (el) { el.classList.remove('in'); });
+    if (reduce) {
+      Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
+      return;
+    }
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
+      });
     });
-  }, { threshold: 0.12 });
-  Array.prototype.forEach.call(items, function (el) { io.observe(el); });
+  }
+
+  function indexOfCurrent() {
+    for (var i = 0; i < screens.length; i++) if (screens[i].classList.contains('on')) return i;
+    return 0;
+  }
+
+  function show(id, push) {
+    var target = document.getElementById(id);
+    if (!target || screens.indexOf(target) < 0) { id = 'home'; target = screens[0]; }
+    screens.forEach(function (sc) { sc.classList.toggle('on', sc === target); });
+    navBtns.forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-screen') === id); });
+    window.scrollTo(0, 0);
+    playReveal(target);
+    document.title = (id === 'home' ? '' : NAMES[id] + ' · ') + 'REMNANT ARCHIVE : CASE 01 「신입사원」';
+    if (push && location.hash.slice(1) !== id) {
+      history.pushState(null, '', id === 'home' ? location.pathname + location.search : '#' + id);
+    }
+  }
+
+  /* 각 화면 아래에 [이전]/[다음] 붙이기 (홈은 큰 버튼이 이미 있어서 제외) */
+  screens.forEach(function (sc, i) {
+    var wrap = sc.querySelector('.wrap');
+    if (!wrap || sc.id === 'home') return;
+    var prev = screens[i - 1], next = screens[i + 1];
+    var pager = document.createElement('div');
+    pager.className = 'pager';
+    pager.innerHTML =
+      (prev ? '<button type="button" class="btn" data-screen="' + prev.id + '">← ' + NAMES[prev.id] + '</button>'
+            : '<span class="spacer"></span>') +
+      (next ? '<button type="button" class="btn btn--primary" data-screen="' + next.id + '">' + NAMES[next.id] + ' →</button>'
+            : '<span class="spacer"></span>');
+    wrap.appendChild(pager);
+  });
+
+  /* 전환 버튼 누르기 (나중에 만들어진 [이전]/[다음]도 받도록 문서에서 받는다) */
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-screen]') : null;
+    if (!el) return;
+    e.preventDefault();
+    show(el.getAttribute('data-screen'), true);
+  });
+  document.querySelector('.brand').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show('home', true); }
+  });
+
+  /* ← → 키로도 넘긴다 */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    var tag = (document.activeElement || {}).tagName || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (document.getElementById('lightbox').classList.contains('on')) return;
+    var to = screens[indexOfCurrent() + (e.key === 'ArrowRight' ? 1 : -1)];
+    if (to) { e.preventDefault(); show(to.id, true); }
+  });
+
+  /* 뒤로 가기·앞으로 가기, 그리고 첫 화면 */
+  window.addEventListener('popstate', function () { show(location.hash.slice(1) || 'home', false); });
+  show(location.hash.slice(1) || 'home', false);
 })();
 
 /* 이미지 확대 보기 */

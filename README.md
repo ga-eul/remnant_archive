@@ -119,12 +119,14 @@ remnant-intro/
 
 `site/` 폴더는 빌드 결과물이라 Git에 넣지 않습니다. 원본 게임 파일은 고치지 않고, 복사본에서만 허브 파일 이름(`index (1).html` → `index.html`)과 그 주소를 바꿉니다.
 
-랜딩 페이지의 버튼 주소는 `landing/index.html` 안 `LINKS` 세 줄에서 관리합니다. 비워 둔 버튼은 화면에 `(준비 중)`으로 잠깁니다.
+랜딩 페이지는 길게 스크롤하지 않고 **상단 바 버튼·[이전]/[다음]·← → 키로 한 화면씩 넘기는 방식**입니다(화면 9개, 자세한 내용은 `landing/README.md`).
+
+버튼 주소는 `landing/index.html` 안 `LINKS` 세 줄에서 관리합니다. 비워 둔 버튼은 화면에 `(준비 중)`으로 잠깁니다.
 
 | 항목 | 값 |
 |---|---|
 | `play` | `play/` (같은 사이트의 게임 폴더) |
-| `download` | Windows zip 내려받기 주소 — **아직 비어 있음** (itch.io 주소가 정해지면 채웁니다) |
+| `download` | `https://summertumn.itch.io/remnant-archive` (itch.io) |
 | `x` | `https://x.com/remi_r_archive` |
 
 ### 빌드 없이 확인하기
