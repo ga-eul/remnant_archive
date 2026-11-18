@@ -1,15 +1,18 @@
-"""배포용 zip 만들기 → release/dist/
-  1) RemnantArchive-web-<버전>.zip        웹 배포용(itch.io HTML 등). zip 맨 위에 index.html
-  2) RemnantArchiveDemo-<버전>-win-itch.zip     itch.io용 Windows exe + 실행 안내
-  3) RemnantArchiveDemo-<버전>-win-dropbox.zip  드롭박스 공유용 exe + 실행 안내(드롭박스 경고 줄 포함)
-원본 게임 파일은 고치지 않는다. 웹용은 복사본에서만 허브 파일 이름을 index.html로 바꾸고 허브 주소 세 곳을 함께 바꾼다.
-exe는 desktop/에서 `npm run dist`로 먼저 만들어 둔다.
-실행: 저장소 루트에서 python release/build_release.py"""
-import json, os, sys, zipfile
+"""배포용 묶음 만들기
+  python release/build_release.py        → release/dist/ 에 zip 3개
+    1) RemnantArchive-web-<버전>.zip        웹 배포용(itch.io HTML 등). zip 맨 위에 index.html
+    2) RemnantArchiveDemo-<버전>-win-itch.zip     itch.io용 Windows exe + 실행 안내
+    3) RemnantArchiveDemo-<버전>-win-dropbox.zip  드롭박스 공유용 exe + 실행 안내(드롭박스 경고 줄 포함)
+  python release/build_release.py site   → site/ 에 GitHub Pages용 폴더 (/ = 랜딩, /play/ = 허브+게임)
+원본 게임 파일은 고치지 않는다. 복사본에서만 허브 파일 이름을 index.html로 바꾸고 허브 주소 세 곳을 함께 바꾼다.
+exe는 desktop/에서 `npm run dist`로 먼저 만들어 둔다. site는 exe가 없어도 만들어진다.
+실행: 저장소 루트에서"""
+import json, os, shutil, sys, zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(HERE, 'dist')
+SITE = os.path.join(ROOT, 'site')
 VERSION = json.load(open(os.path.join(ROOT, 'desktop', 'package.json'), encoding='utf-8'))['version']
 
 PAGES = ['index (1).html', 'first-launch-notice-terminal.html', 'loading.html', 'shinip_demo_complete.html']
@@ -37,26 +40,62 @@ def web_files():
     return sorted(files)
 
 
-def build_web():
+def web_entries():
+    """(배포 경로, 원본 경로, 바꾼 내용 또는 None) — 허브 주소 세 곳을 복사본에서만 바꾼다"""
     edits = {f: (a, b) for f, a, b in WEB_EDITS}
+    out = []
+    for arc, src in web_files():
+        if arc in edits:
+            text = open(src, encoding='utf-8').read()
+            old, new = edits.pop(arc)
+            if text.count(old) != 1:
+                fail(f'{arc}: "{old}"가 {text.count(old)}번 있습니다 (1번이어야 함)')
+            out.append((arc, src, text.replace(old, new)))
+        else:
+            out.append((arc, src, None))
+    if edits:
+        fail('바꾸지 못한 파일: ' + ', '.join(edits))
+    return out
+
+
+def build_web():
     name = os.path.join(OUT, f'RemnantArchive-web-{VERSION}.zip')
     with zipfile.ZipFile(name, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        for arc, src in web_files():
-            if arc in edits:
-                text = open(src, encoding='utf-8').read()
-                old, new = edits.pop(arc)
-                if text.count(old) != 1:
-                    fail(f'{arc}: "{old}"가 {text.count(old)}번 있습니다 (1번이어야 함)')
-                z.writestr(arc, text.replace(old, new).encode('utf-8'))
-            else:
+        for arc, src, text in web_entries():
+            if text is None:
                 z.write(src, arc)
-        if edits:
-            fail('바꾸지 못한 파일: ' + ', '.join(edits))
-        # 웹용 묶음에 옛 허브 이름을 가리키는 코드가 남지 않았는지 (주석 제외는 위 세 곳으로 확인)
+            else:
+                z.writestr(arc, text.encode('utf-8'))
         n = len(z.namelist())
     if n > 1000:
         fail(f'파일 {n}개 — itch.io HTML 업로드 한도(1000개)를 넘습니다')
     return name, n
+
+
+def build_site():
+    """GitHub Pages용 폴더 site/ — / = 랜딩 페이지, /play/ = 허브와 게임"""
+    landing = os.path.join(ROOT, 'landing')
+    if not os.path.exists(os.path.join(landing, 'index.html')):
+        fail('landing/index.html 이 없습니다')
+    if os.path.exists(SITE):
+        shutil.rmtree(SITE)
+    os.makedirs(SITE)
+    # 랜딩 페이지 → 사이트 루트 (README.md는 올리지 않는다)
+    shutil.copy2(os.path.join(landing, 'index.html'), os.path.join(SITE, 'index.html'))
+    shutil.copytree(os.path.join(landing, 'images'), os.path.join(SITE, 'images'))
+    # 허브와 게임 → /play/
+    n = 2
+    for arc, src, text in web_entries():
+        dst = os.path.join(SITE, 'play', *arc.split('/'))
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        if text is None:
+            shutil.copy2(src, dst)
+        else:
+            open(dst, 'w', encoding='utf-8', newline='').write(text)
+        n += 1
+    # Jekyll이 밑줄로 시작하는 파일을 빼먹지 않도록
+    open(os.path.join(SITE, '.nojekyll'), 'w').close()
+    return SITE, n
 
 
 def build_exe(host):
@@ -74,6 +113,12 @@ def build_exe(host):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == 'site':
+        path, n = build_site()
+        print(f'[release] {os.path.relpath(path, ROOT)}/  (파일 {n}개) — / 랜딩, /play/ 게임')
+        sys.exit(0)
+    if len(sys.argv) > 1:
+        fail(f'모르는 인자: {sys.argv[1]} (쓸 수 있는 값: site)')
     os.makedirs(OUT, exist_ok=True)
     web, n = build_web()
     print(f'[release] {os.path.relpath(web, ROOT)}  (파일 {n}개)')

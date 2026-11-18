@@ -13,3 +13,6 @@ desktop/app-content/
 desktop/dist/
 # 배포용 zip 결과물 (release/build_release.py)
 release/dist/
+
+# GitHub Pages 배포용 폴더 (release/build_release.py site 가 만듦)
+site/
