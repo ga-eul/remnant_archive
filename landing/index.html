@@ -262,6 +262,43 @@
     .navlinks{overflow-x:auto; gap:0}
     .navlinks button{padding:7px 8px; font-size:12px}
   }
+
+  /* ── 휴대폰 (랜딩 페이지만 대응, D99. 게임은 PC 전용 D80) ─────────
+     상단 바를 2단으로 내린다: 윗줄 로고·CASE 01 / 아랫줄 화면 이름 버튼 */
+  @media (max-width:720px){
+    .wrap{width:calc(100% - 32px)}
+    .topbar .wrap{flex-wrap:wrap; height:auto; gap:10px; padding:10px 0 0}
+    .brand img{height:40px}
+    .brand span{font-size:11px; padding:4px 7px 3px 9px}
+    .topbar .btn--primary{display:none}   /* 플레이 버튼은 히어로·시작하기 화면에 맡긴다 */
+    .navlinks{
+      order:3; width:100%; margin:0 -16px; padding:0 16px 8px; gap:0;
+      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+      /* 오른쪽 끝을 흐리게 해서 가로로 더 있다는 것을 알린다 */
+      -webkit-mask-image:linear-gradient(90deg, #000 calc(100% - 34px), transparent);
+      mask-image:linear-gradient(90deg, #000 calc(100% - 34px), transparent);
+    }
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks button{font-size:13px; padding:8px 9px}
+
+    section.screen{padding:34px 0 48px}
+    section.screen.on{min-height:0}
+    .hero__inner{padding:56px 0 52px}
+    .hero__cta{gap:10px}
+    .hero__cta .btn--lg{width:100%; justify-content:center; padding:14px 18px}
+    .steps,.gal{grid-template-columns:1fr}
+    .card{padding:22px 20px}
+    .card .btn{align-self:stretch; justify-content:center}
+    .outro{padding:52px 0}
+    .outro .btn{width:100%; justify-content:center}
+    .pager{margin-top:40px; gap:10px}
+    .pager .btn{padding:11px 13px; font-size:12.5px}
+    .notice{padding:20px 18px}
+    .lightbox{padding:16px}
+    .lightbox img{max-height:76vh}
+    footer .wrap{gap:8px}
+  }
+  [hidden]{display:none !important}
 </style>
 </head>
 <body>
@@ -448,6 +485,7 @@
         <p class="tag">BROWSER</p>
         <h3>브라우저에서 바로 플레이</h3>
         <p>설치 없이 바로 시작합니다. 전체 화면을 권장합니다.</p>
+        <p data-pc-note hidden><b>휴대폰·태블릿에서는 플레이할 수 없습니다.</b> PC 브라우저에서 이 페이지를 열어 주세요.</p>
         <a class="btn btn--primary" data-link="play" href="#">브라우저로 플레이</a>
       </div>
       <div class="card">
@@ -533,6 +571,46 @@ document.querySelectorAll('[data-link]').forEach(function (el) {
     el.addEventListener('click', function (e) { e.preventDefault(); });
   }
 });
+
+/* ────────────────────────────────────────────────
+   휴대폰·태블릿에서는 [브라우저로 플레이]를 잠근다.
+   랜딩 페이지는 좁은 화면에서도 읽히지만 게임 본편은 PC 전용이다 (D80·D99)
+   ──────────────────────────────────────────────── */
+(function () {
+  var narrow = window.matchMedia('(max-width: 720px)');
+  var touch  = window.matchMedia('(pointer: coarse) and (max-width: 1024px)');
+  var plays  = Array.prototype.slice.call(document.querySelectorAll('[data-link="play"]'));
+  var notes  = Array.prototype.slice.call(document.querySelectorAll('[data-pc-note]'));
+
+  function apply() {
+    var lock = narrow.matches || touch.matches;
+    plays.forEach(function (el) {
+      if (lock) {
+        if (!el.getAttribute('data-label')) el.setAttribute('data-label', el.textContent.trim());
+        el.textContent = 'PC에서 플레이하세요';
+        el.setAttribute('aria-disabled', 'true');
+        el.setAttribute('href', '#');
+        el.removeAttribute('target');
+      } else if (el.getAttribute('data-label')) {
+        el.textContent = el.getAttribute('data-label');
+        el.removeAttribute('aria-disabled');
+        if (LINKS.play) el.setAttribute('href', LINKS.play);
+      }
+    });
+    notes.forEach(function (el) { el.hidden = !lock; });
+  }
+
+  plays.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      if (el.getAttribute('aria-disabled') === 'true') e.preventDefault();
+    });
+  });
+  apply();
+  [narrow, touch].forEach(function (mq) {
+    if (mq.addEventListener) mq.addEventListener('change', apply);
+    else if (mq.addListener) mq.addListener(apply);
+  });
+})();
 
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -638,6 +716,27 @@ var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var to = screens[indexOfCurrent() + (e.key === 'ArrowRight' ? 1 : -1)];
     if (to) { e.preventDefault(); show(to.id, true); }
   });
+
+  /* 휴대폰: 좌우로 쓸어넘겨 넘긴다 */
+  (function () {
+    var x0 = null, y0 = 0, t0 = 0;
+    document.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1 ||
+          (e.target.closest && e.target.closest('.navlinks'))) { x0 = null; return; }
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      var dy = e.changedTouches[0].clientY - y0;
+      x0 = null;
+      if (Date.now() - t0 > 700) return;                       // 천천히 끈 것은 넘기지 않는다
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;   // 세로로 긁은 것도 제외
+      if (document.getElementById('lightbox').classList.contains('on')) return;
+      var to = screens[indexOfCurrent() + (dx < 0 ? 1 : -1)];
+      if (to) show(to.id, true);
+    }, { passive: true });
+  })();
 
   /* 뒤로 가기·앞으로 가기, 그리고 첫 화면 */
   window.addEventListener('popstate', function () { show(location.hash.slice(1) || 'home', false); });
