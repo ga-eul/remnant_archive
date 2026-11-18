@@ -16,3 +16,6 @@ release/dist/
 
 # GitHub Pages 배포용 폴더 (release/build_release.py site 가 만듦)
 site/
+
+# 엔딩 일러스트 원본(PSD): 따로 보관 (게임용 내보내기 파일만 커밋)
+엔딩/*.psd

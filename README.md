@@ -100,8 +100,39 @@ remnant-intro/
 - 코드 서명이 없어서 처음 실행할 때 Windows SmartScreen 경고가 뜹니다([추가 정보] → [실행]).
 - 아이콘을 바꾸려면 저장소 루트 `아이콘.png`를 바꾼 뒤 `python desktop/scripts/make-icon.py`를 실행합니다.
 
-## GitHub Pages로 올리기
+## GitHub Pages로 올리기 (D98)
 
-1. 저장소 맨 위(루트)에 `index.html`과 `images` 폴더를 그대로 올립니다.
-2. 저장소 Settings → Pages → Branch를 `main`으로 지정합니다.
-3. 몇 분 뒤 `https://아이디.github.io/저장소이름/` 주소로 열립니다.
+공개 주소: **https://ga-eul.github.io/remnant_archive/** (커스텀 도메인은 쓰지 않습니다)
+
+| 주소 | 내용 |
+|---|---|
+| `/` | 홍보용 랜딩 페이지 (`landing/index.html`) |
+| `/play/` | 이 인트로 페이지(허브)와 CASE 01 게임 |
+
+`main`에 푸시하면 `.github/workflows/pages.yml`이 자동으로 돌아갑니다.
+진행 규칙·저장·금지 문자열 검사(`node tests/logic.test.js`) → 배포 폴더 `site/` 만들기(`python release/build_release.py site`) → Pages 배포 순서입니다. 검사가 실패하면 배포하지 않습니다.
+
+처음 한 번만 해둘 설정:
+
+1. 저장소 Settings → Pages → **Build and deployment → Source**를 `GitHub Actions`로 지정합니다.
+2. 이후에는 푸시만 하면 Actions 탭에서 배포 결과를 볼 수 있습니다. 직접 돌리려면 Actions → `Pages 배포` → Run workflow.
+
+`site/` 폴더는 빌드 결과물이라 Git에 넣지 않습니다. 원본 게임 파일은 고치지 않고, 복사본에서만 허브 파일 이름(`index (1).html` → `index.html`)과 그 주소를 바꿉니다.
+
+랜딩 페이지의 버튼 주소는 `landing/index.html` 안 `LINKS` 세 줄에서 관리합니다. 비워 둔 버튼은 화면에 `(준비 중)`으로 잠깁니다.
+
+| 항목 | 값 |
+|---|---|
+| `play` | `play/` (같은 사이트의 게임 폴더) |
+| `download` | Windows zip 내려받기 주소 — **아직 비어 있음** (itch.io 주소가 정해지면 채웁니다) |
+| `x` | `https://x.com/remi_r_archive` |
+
+### 빌드 없이 확인하기
+
+저장소 루트에서 로컬 서버를 띄우면 허브→게임→허브 흐름을 볼 수 있습니다.
+
+```
+python -m http.server
+```
+
+배포 폴더 그대로(랜딩→게임)를 확인하려면 `python release/build_release.py site` 뒤에 `site/`에서 서버를 띄웁니다.
