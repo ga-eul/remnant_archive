@@ -22,7 +22,7 @@ landing/
 | 3 | `how` | 플레이 방식 | 02 HOW TO PLAY — 조사 방식 |
 | 4 | `features` | 특징 | 03 FEATURES — 데모의 특징 |
 | 5 | `shots` | 화면 | 04 SCREENS — 스크린샷 6장 (이미지를 누르면 확대) |
-| 6 | `motion` | 움직이는 화면 | 05 IN MOTION — GIF 2개 (이미지를 누르면 확대) |
+| 6 | `motion` | 플레이 장면 | 05 IN MOTION — GIF 2개 (이미지를 누르면 확대) |
 | 7 | `info` | 플레이 정보 | 06 INFO — 분량·사양 |
 | 8 | `start` | 시작하기 | 07 START — 브라우저 플레이 / Windows 다운로드 안내 |
 | 9 | `notice` | 안내 | 08 BEFORE YOU PLAY — 플레이 전 안내 |
