@@ -20,6 +20,9 @@
     --text:#e6edf3; --muted:#8b949e; --dim:#5b636d;
     --accent:#3fb68b; --neon:#2ee6d6; --warn:#d1453b;
     --mono:"JetBrains Mono", ui-monospace, monospace;
+    /* 버튼용: JetBrains Mono 에 한글이 없어 그대로 두면 한글만 시스템 기본(맑은 고딕)으로
+       떨어진다. 한글은 Noto Sans KR 로 받는다 */
+    --mono-kr:"JetBrains Mono", "Noto Sans KR", ui-monospace, monospace;
     --sans:"Noto Sans KR", system-ui, sans-serif;
     --wrap:1120px;
   }
@@ -61,21 +64,15 @@
     display:inline-flex; align-items:center; gap:8px;
     padding:11px 20px; border:1px solid var(--line); border-radius:3px;
     background:var(--surface); color:var(--text);
-    font-family:var(--mono); font-size:13px; letter-spacing:.04em;
+    font-family:var(--mono-kr); font-size:13px; font-weight:700; letter-spacing:.02em;
     cursor:pointer; transition:.18s;
   }
   .btn:hover{border-color:var(--accent); color:#fff; text-decoration:none; transform:translateY(-1px)}
   .btn--primary{
-    background:var(--accent); border-color:var(--accent); color:#06120d; font-weight:500;
+    background:var(--accent); border-color:var(--accent); color:#06120d;
   }
   .btn--primary:hover{background:#4ac79a; border-color:#4ac79a; color:#06120d; box-shadow:0 0 22px -6px rgba(63,182,139,.75)}
   .btn--lg{padding:15px 28px; font-size:14px}
-  /* [브라우저로 플레이]·[Windows 다운로드]: JetBrains Mono 에 한글이 없어 맑은 고딕 Regular 로 떨어지면서
-     힘없이 보였다. 한글은 Noto Sans KR 로 받고 두 글꼴 모두 굵게 쓴다 */
-  .btn[data-link="play"], .btn[data-link="download"]{
-    font-family:"JetBrains Mono", "Noto Sans KR", ui-monospace, monospace;
-    font-weight:700; letter-spacing:.02em;
-  }
   .btn[aria-disabled="true"]{opacity:.42; cursor:not-allowed; transform:none; border-color:var(--line); background:var(--surface); color:var(--muted); box-shadow:none}
 
   /* ── 히어로 ─────────────────────────────────── */
