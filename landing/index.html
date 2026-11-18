@@ -559,11 +559,8 @@ var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
       return;
     }
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
-      });
-    });
+    void root.offsetWidth;   // 리플로를 강제해 전환이 처음부터 재생되게 한다
+    Array.prototype.forEach.call(items, function (el) { el.classList.add('in'); });
   }
 
   function indexOfCurrent() {
